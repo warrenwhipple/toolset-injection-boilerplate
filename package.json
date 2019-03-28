@@ -5,7 +5,7 @@
   "description": "Rollup HTML + JS + SASS into WP Toolset importable XML",
   "main": "index.js",
   "scripts": {
-    "build": "gulp build",
+    "dev": "gulp dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +14,7 @@
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
+    "browser-sync": "^2.26.3",
     "gulp": "^4.0.0",
     "gulp-sass": "^4.0.2",
     "jquery": "^3.3.1",
