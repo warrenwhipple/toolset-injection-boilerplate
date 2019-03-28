@@ -5,6 +5,7 @@
   "description": "Rollup HTML + JS + SASS into WP Toolset importable XML",
   "main": "index.js",
   "scripts": {
+    "build": "gulp build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

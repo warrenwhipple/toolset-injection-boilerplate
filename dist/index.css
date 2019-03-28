@@ -1,0 +1,2 @@
+.hello-sass-outer .hello-sass-inner::after {
+  content: 'Hello sass!'; }

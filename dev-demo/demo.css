@@ -1,0 +1,3 @@
+.hello-demo-css::after {
+  content: 'Hello demo css!';
+}
