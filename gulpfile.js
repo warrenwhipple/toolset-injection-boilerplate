@@ -9,13 +9,14 @@ const browserSync = require('browser-sync').create();
 
 async function serve() {
   await browserSync.init({
-    server: { 
+    server: {
       baseDir: './dev-demo',
       routes: {
         '/jquery': './node_modules/jquery/dist',
-        '/build': './tmp'
-      }
-     },
+        '/bootstrap': './node_modules/bootstrap/dist',
+        '/build': './tmp',
+      },
+    },
   });
 }
 
@@ -35,10 +36,12 @@ async function devBuildScripts() {
     plugins: [
       resolve(),
       babel({
+        babelrc: false,
+        presets: [['@babel/env', { modules: false }]],
         exclude: 'node_modules/**',
       }),
     ],
-    external: 'jquery',
+    external: ['jquery', 'bootstrap'],
   });
   await bundle.write({
     file: './tmp/script.js',
