@@ -1,0 +1,18 @@
+[wpv-layout-start][wpv-items-found]
+<div class="my-custom-wrapper">
+  <!-- wpv-loop-start -->
+  <wpv-loop>
+    <div class="my-custom-item">
+      [wpv-post-featured-image size='medium']
+      <h3>[wpv-post-title]</h3>
+      <p class="my-custom-date">[wpv-post-date]</p>
+      <p class="my-custom-excerpt">
+        [wpv-post-excerpt length='200' format='noautop']
+      </p>
+    </div>
+  </wpv-loop>
+  <!-- wpv-loop-end -->
+</div>
+[/wpv-items-found][wpv-no-items-found]
+<strong>[wpml-string context="wpv-views"]No items found[/wpml-string]</strong>
+[/wpv-no-items-found][wpv-layout-end]
