@@ -3,8 +3,8 @@
   <views>
     <view>
       <post_content>[wpv-filter-meta-html] [wpv-layout-meta-html]</post_content>
-      <post_title>{{title}}</post_title>
-      <post_name>{{slug}}</post_name>
+      <post_title>My Custom View</post_title>
+      <post_name>my-custom-view</post_name>
       <post_excerpt></post_excerpt>
       <post_type>view</post_type>
       <post_status>publish</post_status>
@@ -57,16 +57,11 @@
             <js>off</js>
             <img>off</img>
           </layout_meta_html_state>
-          <layout_meta_html_css>
-            <!-- inject:css -->
-            <link rel="stylesheet" href="/tmp/style.css">
-            <!-- endinject -->
-          </layout_meta_html_css>
-          <layout_meta_html_js>
-            <!-- inject:js -->
-            <script src="/tmp/script.js"></script>
-            <!-- endinject -->
-          </layout_meta_html_js>
+          <layout_meta_html_css>.hello-sass-outer .hello-sass-inner::after {
+  content: &#39;Hello sass!&#39;; }
+</layout_meta_html_css>
+          <layout_meta_html_js>!function(e){&quot;use strict&quot;;e&#x3D;e&amp;&amp;e.hasOwnProperty(&quot;default&quot;)?e.default:e,document.addEventListener(&quot;DOMContentLoaded&quot;,function(){document.getElementsByClassName(&quot;hello-rollup&quot;)[0].textContent&#x3D;&quot;Hello rollup!&quot;,document.getElementsByClassName(&quot;hello-import&quot;)[0].textContent&#x3D;&quot;Hello example import!&quot;}),document.addEventListener(&quot;DOMContentLoaded&quot;,function(){document.getElementsByClassName(&quot;hello-babel&quot;)[0].textContent&#x3D;&quot;Hello babel!&quot;}),e(function(){e(&quot;.hello-jquery-external&quot;).text(&quot;Hello jquery external!&quot;),e(&quot;.hello-bootstrap-external&quot;).append(&#39;Hello bootstrap external! &lt;div class&#x3D;&quot;spinner-border&quot;&gt;&lt;&#x2F;div&gt;&#39;)})}($);
+</layout_meta_html_js>
           <sections-show-hide>
             <pagination>off</pagination>
             <filter-extra-parametric>off</filter-extra-parametric>
@@ -84,7 +79,25 @@
         </_wpv_settings>
         <_wpv_layout_settings>
           <additional_js></additional_js>
-          <layout_meta_html>{{html}}</layout_meta_html>
+          <layout_meta_html>[wpv-layout-start][wpv-items-found]
+&lt;div class&#x3D;&quot;my-custom-wrapper&quot;&gt;
+  &lt;!-- wpv-loop-start --&gt;
+  &lt;wpv-loop&gt;
+    &lt;div class&#x3D;&quot;my-custom-item&quot;&gt;
+      [wpv-post-featured-image size&#x3D;&#39;medium&#39;]
+      &lt;h3&gt;[wpv-post-title]&lt;&#x2F;h3&gt;
+      &lt;p class&#x3D;&quot;my-custom-date&quot;&gt;[wpv-post-date]&lt;&#x2F;p&gt;
+      &lt;p class&#x3D;&quot;my-custom-excerpt&quot;&gt;
+        [wpv-post-excerpt length&#x3D;&#39;200&#39; format&#x3D;&#39;noautop&#39;]
+      &lt;&#x2F;p&gt;
+    &lt;&#x2F;div&gt;
+  &lt;&#x2F;wpv-loop&gt;
+  &lt;!-- wpv-loop-end --&gt;
+&lt;&#x2F;div&gt;
+[&#x2F;wpv-items-found][wpv-no-items-found]
+&lt;strong&gt;[wpml-string context&#x3D;&quot;wpv-views&quot;]No items found[&#x2F;wpml-string]&lt;&#x2F;strong&gt;
+[&#x2F;wpv-no-items-found][wpv-layout-end]
+</layout_meta_html>
           <style>unformatted</style>
           <table_cols>2</table_cols>
           <bootstrap_grid_cols>1</bootstrap_grid_cols>

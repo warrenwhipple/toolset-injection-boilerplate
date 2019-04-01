@@ -6,9 +6,10 @@ const { rollup } = require('rollup');
 const nodeResolve = require('rollup-plugin-node-resolve');
 const babel = require('rollup-plugin-babel');
 const { terser } = require('rollup-plugin-terser');
-// const mustach = require('gulp-mustache');
+const fs = require('fs');
+const viewConfig = require('./src/view-config.json');
+const mustach = require('gulp-mustache');
 const browserSync = require('browser-sync').create();
-// const config = require('./src/config');
 
 async function buildStyles() {
   await src('./src/style.scss')
@@ -51,37 +52,38 @@ const rollupProdConfig = {
   plugins: [...rollupDevConfig.plugins, terser()],
 };
 
+const rollupWriteConfig = {
+  file: './tmp/script.js',
+  format: 'iife',
+  name: 'script',
+  globals: { jquery: '$' },
+};
+
 async function buildScripts() {
   const bundle = await rollup(rollupDevConfig);
-  await bundle.write({
-    file: './tmp/script.js',
-    format: 'iife',
-    name: 'script',
-    globals: { jquery: '$' },
-  });
+  await bundle.write(rollupWriteConfig);
 }
 
 async function stringifyScripts() {
   const bundle = await rollup(rollupProdConfig);
-  // TODO: Get Rollup output code as string
-  const js = bundle.source;
-  console.log(js);
-  return js;
-}
-
-async function readFile(path, opts = 'utf8') {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, opts, (err, data) => {
-      if (err) reject(err);
-      else resolve(data);
-    });
-  });
+  await bundle.write(rollupWriteConfig);
+  return fs.readFileSync(rollupWriteConfig.file, 'utf8');
 }
 
 async function buildToolsetImport() {
   const css = await stringifyStyles();
-  console.log('CSS:', css);
   const js = await stringifyScripts();
+  const html = fs.readFileSync('./src/loop.html', 'utf8');
+  await src('./templates/toolset-import.xml')
+    .pipe(
+      mustach({
+        ...viewConfig,
+        css,
+        js,
+        html,
+      })
+    )
+    .pipe(dest('./dist'));
 }
 
 async function serve() {
