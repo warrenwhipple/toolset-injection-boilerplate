@@ -7,7 +7,7 @@ const nodeResolve = require('rollup-plugin-node-resolve');
 const babel = require('rollup-plugin-babel');
 const { terser } = require('rollup-plugin-terser');
 const fs = require('fs');
-const viewConfig = require('./src/view-config.json');
+const packageData = require('./package.json');
 const mustach = require('gulp-mustache');
 const browserSync = require('browser-sync').create();
 
@@ -77,7 +77,7 @@ async function buildToolsetImport() {
   await src('./templates/toolset-import.xml')
     .pipe(
       mustach({
-        ...viewConfig,
+        title: packageData.name,
         css,
         js,
         html,

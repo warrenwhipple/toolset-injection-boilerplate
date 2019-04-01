@@ -2,9 +2,8 @@
 <views>
   <views>
     <view>
-      <post_content>[wpv-filter-meta-html] [wpv-layout-meta-html]</post_content>
-      <post_title>My Custom View</post_title>
-      <post_name>my-custom-view</post_name>
+      <post_content>[wpv-filter-meta-html][wpv-layout-meta-html]</post_content>
+      <post_title>toolset-injection-boilerplate</post_title>
       <post_excerpt></post_excerpt>
       <post_type>view</post_type>
       <post_status>publish</post_status>

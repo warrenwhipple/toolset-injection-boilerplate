@@ -2,9 +2,8 @@
 <views>
   <views>
     <view>
-      <post_content>[wpv-filter-meta-html] [wpv-layout-meta-html]</post_content>
+      <post_content>[wpv-filter-meta-html][wpv-layout-meta-html]</post_content>
       <post_title>{{title}}</post_title>
-      <post_name>{{slug}}</post_name>
       <post_excerpt></post_excerpt>
       <post_type>view</post_type>
       <post_status>publish</post_status>
