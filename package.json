@@ -7,6 +7,7 @@
   "scripts": {
     "build": "gulp build",
     "dev": "gulp dev",
+    "try": "gulp try",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,16 +16,17 @@
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
+    "babel-loader": "^8.0.5",
     "bootstrap": "^4.3.1",
     "browser-sync": "^2.26.3",
     "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
     "gulp-mustache": "^4.1.1",
     "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5",
     "jquery": "^3.3.1",
-    "rollup": "^1.7.4",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-terser": "^4.0.4"
+    "webpack": "^4.29.6",
+    "webpack-stream": "^5.2.1"
   },
   "peerDependencies": {
     "bootstrap": "^4.3.1",

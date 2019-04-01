@@ -2,26 +2,69 @@
 
 const { src, dest, watch, series, parallel } = require('gulp');
 const sass = require('gulp-sass');
-const { rollup } = require('rollup');
-const nodeResolve = require('rollup-plugin-node-resolve');
-const babel = require('rollup-plugin-babel');
-const { terser } = require('rollup-plugin-terser');
+const autoprefixer = require('gulp-autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const webpack = require('webpack');
+const webpackStream = require('webpack-stream');
 const fs = require('fs');
 const packageData = require('./package.json');
 const mustach = require('gulp-mustache');
 const browserSync = require('browser-sync').create();
 
-async function buildStyles() {
-  await src('./src/style.scss')
-    .pipe(sass())
-    .pipe(dest('./tmp'));
+const DEV = 'development';
+const PROD = 'production';
+
+function stylesStream(mode) {
+  let stream = src('./src/styles.scss');
+  if (mode === DEV) stream = stream.pipe(sourcemaps.init());
+  stream = stream.pipe(sass().on('error', sass.logError)).pipe(autoprefixer());
+  if (mode === DEV) stream = stream.pipe(sourcemaps.write());
+  return stream;
 }
 
-async function stringifyStyles() {
+function scriptsStream(mode) {
+  let options = {
+    mode,
+    output: {
+      filename: 'bundle.js',
+      library: 'bundle',
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          exclude: /(node_modules)/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env'],
+              cacheDirectory: true,
+            },
+          },
+        },
+      ],
+    },
+    externals: {
+      jquery: 'jQuery',
+      bootstrap: 'bootstrap',
+    },
+  };
+  if (mode == DEV) options.devtool = 'source-map';
+  return src('./src/scripts.js').pipe(webpackStream(options, webpack));
+}
+
+function buildStyles(mode) {
+  return async () => await stylesStream(mode).pipe(dest('./tmp'));
+}
+
+function buildScripts(mode) {
+  return async () => await scriptsStream(mode).pipe(dest('./tmp'));
+}
+
+async function stringifyStream(stream) {
   return new Promise((resolve, reject) => {
     let str = '';
-    src('./src/style.scss')
-      .pipe(sass())
+    stream
       .on('data', data => {
         str += data.contents.toString();
       })
@@ -34,56 +77,22 @@ async function stringifyStyles() {
   });
 }
 
-const rollupDevConfig = {
-  input: './src/script.js',
-  plugins: [
-    nodeResolve(),
-    babel({
-      babelrc: false,
-      presets: [['@babel/env', { modules: false }]],
-      exclude: 'node_modules/**',
-    }),
-  ],
-  external: ['jquery', 'bootstrap'],
-};
-
-const rollupProdConfig = {
-  ...rollupDevConfig,
-  plugins: [...rollupDevConfig.plugins, terser()],
-};
-
-const rollupWriteConfig = {
-  file: './tmp/script.js',
-  format: 'iife',
-  name: 'script',
-  globals: { jquery: '$' },
-};
-
-async function buildScripts() {
-  const bundle = await rollup(rollupDevConfig);
-  await bundle.write(rollupWriteConfig);
-}
-
-async function stringifyScripts() {
-  const bundle = await rollup(rollupProdConfig);
-  await bundle.write(rollupWriteConfig);
-  return fs.readFileSync(rollupWriteConfig.file, 'utf8');
-}
-
-async function buildToolsetImport() {
-  const css = await stringifyStyles();
-  const js = await stringifyScripts();
-  const html = fs.readFileSync('./src/loop.html', 'utf8');
-  await src('./templates/toolset-import.xml')
-    .pipe(
-      mustach({
-        title: packageData.name,
-        css,
-        js,
-        html,
-      })
-    )
-    .pipe(dest('./dist'));
+function buildToolsetImport(mode) {
+  return async () => {
+    const css = await stringifyStream(stylesStream(mode));
+    const js = await stringifyStream(scriptsStream(mode));
+    const html = fs.readFileSync('./src/loop.html', 'utf8');
+    await src('./templates/toolset-import.xml')
+      .pipe(
+        mustach({
+          title: packageData.name,
+          css,
+          js,
+          html,
+        })
+      )
+      .pipe(dest('./dist'));
+  };
 }
 
 async function serve() {
@@ -103,21 +112,25 @@ async function reload() {
   await browserSync.reload();
 }
 
-function watchStyles() {
-  watch('./src/**/*.scss', series(buildStyles, reload));
+function watchStyles(mode) {
+  return () => {
+    watch('./src/**/*.scss', series(buildStyles(mode), reload));
+  };
 }
 
-function watchScripts() {
-  watch('./src/**/*.js', series(buildScripts, reload));
+function watchScripts(mode) {
+  return () => {
+    watch('./src/**/*.js', series(buildScripts(mode), reload));
+  };
 }
 
 function watchDevDemo() {
   watch('./dev-demo/*.*', reload);
 }
 
-exports.build = series(buildToolsetImport);
+exports.build = series(buildToolsetImport(PROD));
 exports.dev = series(
-  parallel(buildStyles, buildScripts),
+  parallel(buildStyles(DEV), buildScripts(DEV)),
   serve,
-  parallel(watchStyles, watchScripts, watchDevDemo)
+  parallel(watchStyles(DEV), watchScripts(DEV), watchDevDemo)
 );
