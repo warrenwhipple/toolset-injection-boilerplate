@@ -57,7 +57,14 @@
             <img>off</img>
           </layout_meta_html_state>
           <layout_meta_html_css>{{css}}</layout_meta_html_css>
-          <layout_meta_html_js>{{js}}</layout_meta_html_js>
+          <layout_meta_html_js>/**
+ * {{title}}
+ * @version {{version}}
+ * @link {{link}}
+ * @author {{author}}
+ * @licence {{license}}
+ */
+ {{js}}</layout_meta_html_js>
           <sections-show-hide>
             <pagination>off</pagination>
             <filter-extra-parametric>off</filter-extra-parametric>

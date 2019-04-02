@@ -1,18 +1,26 @@
 {
   "name": "toolset-injection-boilerplate",
   "version": "0.1.0",
-  "description": "Rollup HTML + JS + SASS into WP Toolset importable XML",
+  "description": "Bundle HTML + JS + CSS into WordPress Toolset importable XML",
   "private": true,
-  "main": "index.js",
+  "homepage": "https://github.com/warrenwhipple/toolset-injection-boilerplate",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/warrenwhipple/toolset-injection-boilerplate.git"
+  },
   "scripts": {
     "build": "gulp build",
-    "dev": "gulp dev",
-    "try": "gulp try",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "gulp dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "wordpress",
+    "toolset",
+    "webpack",
+    "babel",
+    "sass"
+  ],
+  "author": "Warren Whipple",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.2",

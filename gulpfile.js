@@ -82,10 +82,15 @@ function buildToolsetImport(mode) {
     const css = await stringifyStream(stylesStream(mode));
     const js = await stringifyStream(scriptsStream(mode));
     const html = fs.readFileSync('./src/loop.html', 'utf8');
+    const { name, version, homepage, author, license } = packageData;
     await src('./templates/toolset-import.xml')
       .pipe(
         mustach({
-          title: packageData.name,
+          title: name,
+          version,
+          link: homepage,
+          author,
+          license,
           css,
           js,
           html,
