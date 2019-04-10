@@ -105,8 +105,7 @@ async function serve() {
     server: {
       baseDir: './dev-demo',
       routes: {
-        '/jquery': './node_modules/jquery/dist',
-        '/bootstrap': './node_modules/bootstrap/dist',
+        '/node_modules': './node_modules',
         '/build': './tmp',
       },
     },

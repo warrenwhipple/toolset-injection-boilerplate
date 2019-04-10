@@ -2,8 +2,8 @@ import $ from 'jquery';
 import { helloImport } from './exampleImport';
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementsByClassName('hello-rollup')[0].textContent =
-    'Hello rollup!';
+  document.getElementsByClassName('hello-webpack')[0].textContent =
+    'Hello webpack!';
   helloImport();
 });
 
