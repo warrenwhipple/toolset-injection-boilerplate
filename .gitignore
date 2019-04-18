@@ -1,5 +1,5 @@
 .DS_STORE
 node_modules
-tmp
+dev-demo/build
 *.log*
 .vscode

@@ -46,7 +46,7 @@ async function buildDevStyles() {
     .pipe(sass().on('error', sass.logError))
     .pipe(autoprefixer())
     .pipe(sourcemaps.write())
-    .pipe(dest('./tmp'))
+    .pipe(dest('./dev-demo/build'))
 }
 
 // Scripts
@@ -87,7 +87,7 @@ const webpackDevOptions = {
   mode: 'development',
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, './tmp'),
+    path: path.resolve(__dirname, './dev-demo/build'),
     filename: 'bundle.js',
     library: 'bundle',
   },
@@ -99,7 +99,7 @@ const webpackDevUtilsOptions = {
   mode: 'development',
   entry: './dev-utils/index.js',
   output: {
-    path: path.resolve(__dirname, './tmp'),
+    path: path.resolve(__dirname, './dev-demo/build'),
     filename: 'utils.js',
     library: 'utils',
   },
@@ -147,14 +147,18 @@ async function buildToolsetXml() {
 
 // Development demo
 
+async function copyDevPeerDependencies() {
+  await src([
+    './node_modules/jquery/dist/jquery.js',
+    './node_modules/bootstrap/dist/css/bootstrap.css',
+    './node_modules/bootstrap/dist/js/bootstrap.bundle.js',
+  ]).pipe(dest('./dev-demo/build'))
+}
+
 async function serve() {
   await browserSync.init({
     server: {
       baseDir: './dev-demo',
-      routes: {
-        '/node_modules': './node_modules',
-        '/build': './tmp',
-      },
     },
   })
 }
@@ -179,8 +183,9 @@ function watchDevDemo() {
 }
 
 exports.build = buildToolsetXml
+exports.buildDemo = parallel(buildDevStyles, buildDevScripts, copyDevPeerDependencies)
 exports.dev = series(
-  parallel(buildDevStyles, buildDevScripts),
+  parallel(buildDevStyles, buildDevScripts, copyDevPeerDependencies),
   serve,
   parallel(watchDevStyles, watchDevScripts, watchDevDemo)
 )

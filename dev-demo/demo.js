@@ -6,6 +6,5 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 $(function() {
-  console.log(utils.postFake)
   utils.postFake('.faker', 10)
 })

@@ -2,7 +2,7 @@
 
 Develop an HTML + CSS + JS feature with third party JS dependencies. Bundle everything into a single importable WordPress [Toolset](https://toolset.com/) XML file for easy distribution.
 
-_Deploying requires at least an [entry level purchase](https://toolset.com/buy/) of the Toolset plugin for WordPress._
+_Deploying to WordPress requires at least an [entry level purchase](https://toolset.com/buy/) of the Toolset plugin._
 
 ## Features
 
@@ -12,13 +12,16 @@ _Deploying requires at least an [entry level purchase](https://toolset.com/buy/)
 - [Babel](https://babeljs.io/) for transpiling modern JavaScript
 - [jQuery](https://jquery.com/) and [Bootstrap](https://getbootstrap.com/) as external peer dependencies
 - [Browsersync](https://www.browsersync.io/) for quick development iteration
+- [Faker](https://github.com/Marak/Faker.js) for dummy posts
 - SASS and JS development sourcemaps
 
 ## Install
 
 ```bash
 git clone https://github.com/warrenwhipple/toolset-injection-boilerplate.git
+
 cd toolset-injection-boilerplate
+
 npm i
 ```
 
@@ -36,6 +39,4 @@ npm run build
 
 Navigate to your `WordPress Dashboard` > `Toolset Export/Import` > `Views` > `Import Views`
 
-Upload `dist/toolset-import.xml`
-
-Press `Import`
+Import `dist/toolset-import.xml`
