@@ -27,7 +27,6 @@
     "babel-loader": "^8.0.5",
     "bootstrap": "^4.3.1",
     "browser-sync": "^2.26.3",
-    "casual": "^1.6.0",
     "gulp": "^4.0.0",
     "gulp-autoprefixer": "^6.0.0",
     "gulp-mustache": "^4.1.1",
@@ -40,5 +39,8 @@
   "peerDependencies": {
     "bootstrap": "^4.3.1",
     "jquery": "^3.3.1"
+  },
+  "dependencies": {
+    "faker": "^4.1.0"
   }
 }

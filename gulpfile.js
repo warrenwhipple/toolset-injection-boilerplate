@@ -1,104 +1,151 @@
-'use strict';
+'use strict'
 
-const { src, dest, watch, series, parallel } = require('gulp');
-const sass = require('gulp-sass');
-const autoprefixer = require('gulp-autoprefixer');
-const sourcemaps = require('gulp-sourcemaps');
-const webpack = require('webpack');
-const webpackStream = require('webpack-stream');
-const fs = require('fs');
-const packageData = require('./package.json');
-const mustach = require('gulp-mustache');
-const browserSync = require('browser-sync').create();
+const { src, dest, watch, series, parallel } = require('gulp')
+const sass = require('gulp-sass')
+const autoprefixer = require('gulp-autoprefixer')
+const sourcemaps = require('gulp-sourcemaps')
+const webpack = require('webpack')
+const webpackStream = require('webpack-stream')
+const path = require('path')
+const fs = require('fs')
+const packageData = require('./package.json')
+const mustach = require('gulp-mustache')
+const browserSync = require('browser-sync').create()
 
-const DEV = 'development';
-const PROD = 'production';
-
-function stylesStream(mode) {
-  let stream = src('./src/styles.scss');
-  if (mode === DEV) stream = stream.pipe(sourcemaps.init());
-  stream = stream.pipe(sass().on('error', sass.logError)).pipe(autoprefixer());
-  if (mode === DEV) stream = stream.pipe(sourcemaps.write());
-  return stream;
-}
-
-function scriptsStream(mode) {
-  let options = {
-    mode,
-    output: {
-      filename: 'bundle.js',
-      library: 'bundle',
-    },
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /(node_modules)/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-env'],
-              cacheDirectory: true,
-            },
-          },
-        },
-      ],
-    },
-    externals: {
-      jquery: 'jQuery',
-      bootstrap: 'bootstrap',
-    },
-  };
-  if (mode == DEV) options.devtool = 'source-map';
-  return src('./src/scripts.js').pipe(webpackStream(options, webpack));
-}
-
-function buildStyles(mode) {
-  return async () => await stylesStream(mode).pipe(dest('./tmp'));
-}
-
-function buildScripts(mode) {
-  return async () => await scriptsStream(mode).pipe(dest('./tmp'));
-}
+// Utils
 
 async function stringifyStream(stream) {
   return new Promise((resolve, reject) => {
-    let str = '';
+    let str = ''
     stream
       .on('data', data => {
-        str += data.contents.toString();
+        str += data.contents.toString()
       })
       .on('end', () => {
-        resolve(str);
+        resolve(str)
       })
       .on('error', error => {
-        reject(error);
-      });
-  });
+        reject(error)
+      })
+  })
 }
 
-function buildToolsetImport(mode) {
-  return async () => {
-    const css = await stringifyStream(stylesStream(mode));
-    const js = await stringifyStream(scriptsStream(mode));
-    const html = fs.readFileSync('./src/loop.html', 'utf8');
-    const { name, version, homepage, author, license } = packageData;
-    await src('./templates/toolset-import.xml')
-      .pipe(
-        mustach({
-          title: name,
-          version,
-          link: homepage,
-          author,
-          license,
-          css,
-          js,
-          html,
-        })
-      )
-      .pipe(dest('./dist'));
-  };
+// Styles
+
+async function stringifyProdStyles() {
+  return await stringifyStream(
+    src('./src/styles.scss')
+      .pipe(sass().on('error', sass.logError))
+      .pipe(autoprefixer())
+  )
 }
+
+async function buildDevStyles() {
+  await src('./src/styles.scss')
+    .pipe(sourcemaps.init())
+    .pipe(sass().on('error', sass.logError))
+    .pipe(autoprefixer())
+    .pipe(sourcemaps.write())
+    .pipe(dest('./tmp'))
+}
+
+// Scripts
+
+const webpackSharedOptions = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            cacheDirectory: true,
+          },
+        },
+      },
+    ],
+  },
+  externals: {
+    jquery: 'jQuery',
+    bootstrap: 'bootstrap',
+  },
+}
+
+const webpackProdOptions = {
+  ...webpackSharedOptions,
+  mode: 'production',
+  output: {
+    filename: 'bundle.js',
+    library: 'bundle',
+  },
+}
+
+const webpackDevOptions = {
+  ...webpackSharedOptions,
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    path: path.resolve(__dirname, './tmp'),
+    filename: 'bundle.js',
+    library: 'bundle',
+  },
+  devtool: 'source-map',
+}
+
+const webpackDevUtilsOptions = {
+  ...webpackSharedOptions,
+  mode: 'development',
+  entry: './dev-utils/index.js',
+  output: {
+    path: path.resolve(__dirname, './tmp'),
+    filename: 'utils.js',
+    library: 'utils',
+  },
+  devtool: 'source-map',
+}
+
+async function stringifyProdScripts() {
+  return await stringifyStream(
+    src('./src/index.js').pipe(webpackStream(webpackProdOptions, webpack))
+  )
+}
+
+async function buildDevScripts() {
+  return new Promise((resolve, reject) => {
+    webpack([webpackDevOptions, webpackDevUtilsOptions], (err, stats) => {
+      if (err) reject(err)
+      if (stats.hasErrors()) reject(stats.toString())
+      resolve()
+    })
+  })
+}
+
+// Toolset XML
+
+async function buildToolsetXml() {
+  const css = await stringifyProdStyles()
+  const js = await stringifyProdScripts()
+  const html = fs.readFileSync('./src/loop.html', 'utf8')
+  const { name, version, homepage, author, license } = packageData
+  await src('./templates/toolset-import.xml')
+    .pipe(
+      mustach({
+        title: name,
+        version,
+        link: homepage,
+        author,
+        license,
+        css,
+        js,
+        html,
+      })
+    )
+    .pipe(dest('./dist'))
+}
+
+// Development demo
 
 async function serve() {
   await browserSync.init({
@@ -109,32 +156,31 @@ async function serve() {
         '/build': './tmp',
       },
     },
-  });
+  })
 }
 
 async function reload() {
-  await browserSync.reload();
+  await browserSync.reload()
 }
 
-function watchStyles(mode) {
-  return () => {
-    watch('./src/**/*.scss', series(buildStyles(mode), reload));
-  };
+function watchDevStyles() {
+  watch('./src/**/*.scss', series(buildDevStyles, reload))
 }
 
-function watchScripts(mode) {
-  return () => {
-    watch('./src/**/*.js', series(buildScripts(mode), reload));
-  };
+function watchDevScripts() {
+  watch(
+    ['./src/**/*.js', './dev-utils/**/*.js'],
+    series(buildDevScripts, reload)
+  )
 }
 
 function watchDevDemo() {
-  watch('./dev-demo/*.*', reload);
+  watch('./dev-demo/*.*', reload)
 }
 
-exports.build = series(buildToolsetImport(PROD));
+exports.build = buildToolsetXml
 exports.dev = series(
-  parallel(buildStyles(DEV), buildScripts(DEV)),
+  parallel(buildDevStyles, buildDevScripts),
   serve,
-  parallel(watchStyles(DEV), watchScripts(DEV), watchDevDemo)
-);
+  parallel(watchDevStyles, watchDevScripts, watchDevDemo)
+)
